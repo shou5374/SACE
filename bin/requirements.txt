@@ -1,0 +1,6 @@
+tqdm
+nltk==3.4.5
+pytorch_transformers==1.2.0
+transformers==3.2.0
+beautifulsoup4
+scikit-learn

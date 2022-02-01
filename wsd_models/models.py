@@ -144,7 +144,7 @@ class LinearAttention(nn.Module):
         att_weight[att_weight == 0] = -1e30
         attention = F.softmax(att_weight, dim=1)
 
-        new_out = torch.mm(attention.half(), aspect_v)
+        new_out = torch.mm(attention, aspect_v)
 
         return new_out
 

@@ -1,0 +1,11 @@
+corpus/
+data/WSD_Evaluation_Framework/
+./Scorer.class
+data/tmp_*
+__pycache__/
+.vscode/*
+!.vscode/settings.json
+!.vscode/launch.json
+data/best_*
+data/dev_*
+data/key_*

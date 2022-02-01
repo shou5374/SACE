@@ -18,7 +18,7 @@ import numpy as np
 
 from wsd_models.util import *
 from wsd_models.models import BiEncoderModel
-from apex import amp
+# from apex import amp
 from copy import deepcopy
 
 parser = argparse.ArgumentParser(description='Gloss Informed Bi-encoder for WSD')
@@ -427,9 +427,9 @@ def _train(train_data, model, gloss_dict, optim, schedule, train_index, train_di
                     mfs_instance += 1
 
         loss = loss / gloss_sz
-        with amp.scale_loss(loss, optim) as scaled_loss:
-            scaled_loss.backward()
-        # loss.backward()
+        # with amp.scale_loss(loss, optim) as scaled_loss:
+        #     scaled_loss.backward()
+        loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), args.grad_norm)
 
         optim.step()
@@ -713,7 +713,7 @@ def train_model(args):
     print('Training probe...')
     sys.stdout.flush()
 
-    model, optimizer = amp.initialize(model, optimizer, opt_level=args.opt_level)
+    # model, optimizer = amp.initialize(model, optimizer, opt_level=args.opt_level)
 
     train_index = dict()
     dev_pred = dict()
@@ -901,7 +901,7 @@ def evaluate_model(args):
         model = BiEncoderModel(args.encoder_name, freeze_gloss=args.freeze_gloss, freeze_context=args.freeze_context)
         model_path = os.path.join(args.ckpt, 'best_model_%s.ckpt' % args.train_mode)
         model.load_state_dict(torch.load(model_path))
-        model = model.cuda().half()
+        model = model.cuda()
         '''
         EVALUATE MODEL
         '''
