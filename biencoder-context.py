@@ -640,8 +640,15 @@ def train_model(args):
     tokenizer = load_tokenizer(args.encoder_name)
 
     #loading WSD (semcor) data
-    train_path = os.path.join(args.data_path, 'Training_Corpora/SemCor/')
-    train_data = load_data(train_path, args.train_data, args.train_sent)
+    if args.train_data == "semcor":
+        train_path = os.path.join(args.data_path, 'Training_Corpora/SemCor/')
+        train_data = load_data(train_path, args.train_data, args.train_sent)
+    else:
+        print("+WNGC, WNEX")
+        train_data = []
+        for d_name in ["SemCor", "WNGC", "WNEX"]:
+            train_path = os.path.join(args.data_path, f'Training_Corpora/{d_name}/')
+            train_data += load_data(train_path, d_name.lower(), args.train_sent)
 
     #filter train data for k-shot learning
     # if args.kshot > 0: train_data = filter_k_examples(train_data, args.kshot)
@@ -914,11 +921,19 @@ def evaluate_model(args):
                 key_mat = pickle.load(open('./data/key_mat_%s_%s' % (args.train_mode, 'ALL'), 'rb'))
         eval_preds, dev_index, _ = _eval(eval_data, model, gloss_dict, dev_index, dev_dict, key_mat)
 
+        split_datas = ['semeval2007', 'senseval2', 'senseval3', 'semeval2013', 'semeval2015']
+
         #generate predictions file
         pred_filepath = os.path.join(args.ckpt, './{}_predictions.txt'.format(args.split))
         with open(pred_filepath, 'w') as f:
             for inst, prediction in eval_preds:
                 f.write('{} {}\n'.format(inst, prediction))
+        
+        for s_data in split_datas:
+            with open(pred_filepath+s_data, 'w') as f:
+                for inst, prediction in eval_preds:
+                    if inst.split(".")[0] == s_data:
+                        f.write('{} {}\n'.format(inst, prediction))
 
         #run predictions through scorer
         gold_filepath = os.path.join(eval_path, '{}.gold.key.txt'.format(args.split))
@@ -928,6 +943,17 @@ def evaluate_model(args):
         print('f1 of BERT probe on {} test set = {}'.format(args.split, f1))
         correct += len(eval_preds) * f1 / 100
         pred_all += len(eval_preds)
+
+        for s_data in split_datas:
+            with open(gold_filepath, 'r') as f, open(gold_filepath+s_data, 'w') as o_f:
+                for line in f:
+                    inst, *labels = line.strip().split()
+                    if inst.split(".")[0] == s_data:
+                        labels = " ".join(labels)
+                        o_f.write('{} {}\n'.format(inst, labels))
+            p, r, f1 = evaluate_output(scorer_path, gold_filepath+s_data, pred_filepath+s_data)
+            print(f"{s_data}: {f1}")
+
     print('Average', correct/pred_all)
     return
 

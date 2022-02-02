@@ -14,7 +14,37 @@ from nltk.corpus import wordnet as wn
 from tqdm import tqdm
 from transformers import AutoTokenizer, AutoModel
 
-pos_converter = {'NOUN':'n', 'PROPN':'n', 'VERB':'v', 'AUX':'v', 'ADJ':'a', 'ADV':'r'}
+# pos_converter = {'NOUN':'n', 'PROPN':'n', 'VERB':'v', 'AUX':'v', 'ADJ':'a', 'ADV':'r'}
+pos_converter = {
+    # U-POS
+    "NOUN": "n",
+    "VERB": "v",
+    "ADJ": "a",
+    "ADV": "r",
+    "PROPN": "n",
+    # PEN
+    "AFX": "a",
+    "JJ": "a",
+    "JJR": "a",
+    "JJS": "a",
+    "MD": "v",
+    "NN": "n",
+    "NNP": "n",
+    "NNPS": "n",
+    "NNS": "n",
+    "RB": "r",
+    "RP": "r",
+    "RBR": "r",
+    "RBS": "r",
+    "VB": "v",
+    "VBD": "v",
+    "VBG": "v",
+    "VBN": "v",
+    "VBP": "v",
+    "VBZ": "v",
+    "WRB": "r",
+    "PRT": "r",
+}
 
 def generate_key(lemma, pos):
     if pos in pos_converter.keys():
